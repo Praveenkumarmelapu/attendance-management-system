@@ -1,13 +1,8 @@
 /**
  * server.js — Entry point of the Express backend
- *
- * What this file does:
- * 1. Loads environment variables from .env
- * 2. Creates an Express application
- * 3. Connects to MongoDB
- * 4. Registers middleware (cors, json parsing)
- * 5. Registers all API routes
- * 6. Starts the server on the configured port
+ * Works two ways:
+ * - `node server.js` for local development (starts a listener)
+ * - Vercel serverless via api/index.js (exports the app, DB per request, cached)
  */
 
 const express = require('express');
@@ -18,20 +13,23 @@ const connectDB = require('./config/db');
 // Load .env variables FIRST before anything else
 dotenv.config();
 
-// Connect to MongoDB
-connectDB();
-
 const app = express();
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
-// cors: Allows our React frontend (port 5173) to talk to this backend (port 5000)
 app.use(cors());
-
-// express.json(): Parses incoming JSON request bodies so we can read req.body
 app.use(express.json());
 
+// Ensure MongoDB is connected before any API route (connection is cached)
+app.use('/api', async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
 // ─── API Routes ──────────────────────────────────────────────────────────────
-// Each route file handles a specific resource
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/students', require('./routes/studentRoutes'));
 app.use('/api/teachers', require('./routes/teacherRoutes'));
@@ -41,7 +39,7 @@ app.use('/api/attendance', require('./routes/attendanceRoutes'));
 const path = require('path');
 const fs = require('fs');
 
-// ─── Static Production Bundle (Ultra-fast Loading) ───────────────────────────
+// ─── Static Production Bundle (only when running the server directly) ────────
 const clientDistPath = path.join(__dirname, '../client/dist');
 if (fs.existsSync(clientDistPath)) {
   app.use(express.static(clientDistPath, { maxAge: '7d' }));
@@ -58,7 +56,6 @@ if (fs.existsSync(clientDistPath)) {
 }
 
 // ─── Global Error Handler ─────────────────────────────────────────────────────
-// Catches any errors that routes throw using next(error)
 app.use((err, req, res, next) => {
   console.error('Server Error:', err.message);
   res.status(err.status || 500).json({
@@ -67,8 +64,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ─── Start Server ─────────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-});
+module.exports = app;
+
+// ─── Start Server (local development only) ────────────────────────────────────
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`✅ Server running on http://localhost:${PORT}`);
+  });
+}

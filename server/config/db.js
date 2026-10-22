@@ -1,30 +1,32 @@
 /**
- * config/db.js — MongoDB Connection
- *
- * What this does:
- * - Uses Mongoose to connect to MongoDB
- * - Mongoose is an ODM (Object Data Modeling) library for MongoDB
- * - It lets us define Schemas and Models to interact with the database
- *
- * MongoDB concepts:
- * - Database: Like a folder that holds all your data (attendance_system)
- * - Collection: Like a table in SQL (users, students, attendance...)
- * - Document: Like a row in SQL — a single record in JSON format
- * - Mongoose Schema: Blueprint for a document (defines fields, types, validation)
- * - Mongoose Model: JS class built from Schema used to query the DB
+ * config/db.js — MongoDB Connection (serverless-safe)
+ * Caches the Mongoose connection across Vercel serverless invocations
+ * so we do not open a new connection per request.
  */
 
 const mongoose = require('mongoose');
 
+let cached = global.__mongoose;
+if (!cached) cached = global.__mongoose = { conn: null, promise: null };
+
 const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.error(`❌ MongoDB Connection Error: ${error.message}`);
-    // Exit process with failure if DB connection fails
-    process.exit(1);
+  const uri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/attendance_system';
+  if (cached.conn) return cached.conn;
+  if (!cached.promise) {
+    mongoose.set('strictQuery', true);
+    cached.promise = mongoose
+      .connect(uri, { serverSelectionTimeoutMS: 8000 })
+      .then((m) => m);
   }
+  try {
+    cached.conn = await cached.promise;
+    console.log(`✅ MongoDB Connected: ${cached.conn.connection.host}`);
+  } catch (error) {
+    cached.promise = null;
+    console.error(`❌ MongoDB Connection Error: ${error.message}`);
+    throw error;
+  }
+  return cached.conn;
 };
 
 module.exports = connectDB;

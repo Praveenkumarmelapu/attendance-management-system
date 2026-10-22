@@ -1,16 +1,25 @@
 {
   "name": "attendance-management-system",
   "version": "1.0.0",
-  "description": "MERN Stack Attendance Management System",
+  "private": true,
+  "description": "AttendEase - MERN Stack Attendance Management System - Vercel deployment layout",
+  "main": "server/server.js",
   "scripts": {
-    "dev": "npx -y concurrently -k -p \"[{name}]\" -n \"SERVER,CLIENT\" -c \"cyan,magenta\" \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
-    "start": "npx -y concurrently -k -p \"[{name}]\" -n \"SERVER,CLIENT\" -c \"cyan,magenta\" \"npm start --prefix server\" \"npm run dev --prefix client\"",
-    "server": "npm run dev --prefix server",
-    "client": "npm run dev --prefix client",
-    "install:all": "npm install --prefix server && npm install --prefix client",
-    "build": "npm run build --prefix client"
+    "start": "node server/server.js",
+    "dev:server": "nodemon server/server.js",
+    "dev:client": "npm --prefix client run dev",
+    "seed": "node server/seed.js",
+    "build": "npm --prefix client install --include=dev && npm --prefix client run build"
   },
-  "keywords": ["attendance", "mern"],
-  "author": "",
-  "license": "ISC"
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.5.0"
+  }
 }
