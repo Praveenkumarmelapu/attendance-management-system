@@ -385,7 +385,7 @@ const MarkAttendance = () => {
                 </div>
               ) : (
                 <>
-                  <div className="table-container" style={{ border: 'none', borderRadius: 0 }}>
+                  <div className="table-container roster-table-wrap" style={{ border: 'none', borderRadius: 0 }}>
                     <table className="table">
                       <thead>
                         <tr>
@@ -480,6 +480,68 @@ const MarkAttendance = () => {
                         })}
                       </tbody>
                     </table>
+                  </div>
+
+                  {/* Mobile Roster Cards (shown on small screens) */}
+                  <div className="roster-mobile-cards">
+                    {students.map((student, idx) => {
+                      const currentStatus = attendance[student._id]?.status || 'present';
+
+                      return (
+                        <div className="roster-mobile-card" key={student._id}>
+                          <div className="roster-mobile-card-head">
+                            <div className="avatar" style={{ width: 34, height: 34, fontSize: '0.78rem', flexShrink: 0 }}>
+                              {student.name?.charAt(0) || '?'}
+                            </div>
+                            <div className="roster-mobile-card-id">
+                              <span className="student-name">{student.name}</span>
+                              <span className="roster-mobile-card-meta">
+                                {student.studentId} • Yr {student.year} • {student.department}
+                              </span>
+                            </div>
+                            <span className="roster-mobile-card-num">{idx + 1}</span>
+                          </div>
+
+                          <div className="attendance-status-toggle roster-mobile-toggle">
+                            <button
+                              type="button"
+                              className={`status-btn ${currentStatus === 'present' ? 'active-present' : ''}`}
+                              onClick={() => handleStatusSelect(student._id, 'present')}
+                            >
+                              <CheckCircle2 size={12} />
+                              <span>Present</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              className={`status-btn ${currentStatus === 'absent' ? 'active-absent' : ''}`}
+                              onClick={() => handleStatusSelect(student._id, 'absent')}
+                            >
+                              <XCircle size={12} />
+                              <span>Absent</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              className={`status-btn ${currentStatus === 'late' ? 'active-late' : ''}`}
+                              onClick={() => handleStatusSelect(student._id, 'late')}
+                            >
+                              <Clock size={12} />
+                              <span>Late</span>
+                            </button>
+                          </div>
+
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Optional remarks"
+                            value={attendance[student._id]?.remarks || ''}
+                            onChange={(e) => handleRemarksChange(student._id, e.target.value)}
+                            style={{ padding: '7px 10px', fontSize: '0.82rem' }}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
 
                   {/* Submit Bar */}
@@ -579,6 +641,83 @@ const MarkAttendance = () => {
 
         .submit-meta-info strong {
           color: var(--text-primary);
+        }
+
+        .roster-mobile-cards {
+          display: none;
+        }
+
+        @media (max-width: 768px) {
+          .roster-table-wrap {
+            display: none;
+          }
+
+          .roster-mobile-cards {
+            display: flex;
+            flex-direction: column;
+          }
+
+          .roster-mobile-card {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-subtle);
+          }
+
+          .roster-mobile-card-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+
+          .roster-mobile-card-id {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            flex: 1;
+          }
+
+          .roster-mobile-card-meta {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .roster-mobile-card-num {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            flex-shrink: 0;
+          }
+
+          .roster-mobile-toggle {
+            display: flex;
+            width: 100%;
+          }
+
+          .roster-mobile-toggle .status-btn {
+            flex: 1;
+            justify-content: center;
+            padding: 8px 6px;
+          }
+
+          .attendance-submit-bar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+            padding: 14px 16px;
+          }
+
+          .attendance-submit-bar .btn {
+            width: 100%;
+            justify-content: center;
+          }
+
+          .submit-meta-info {
+            justify-content: center;
+          }
         }
       `}</style>
     </div>
