@@ -84,7 +84,7 @@ const TeacherDashboard = () => {
           </div>
 
           {/* Metric Cards */}
-          <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: '24px' }}>
+          <div className="stats-grid" style={{ marginBottom: '24px' }}>
             <div className="stat-card">
               <div className="stat-card-header">
                 <span className="stat-label">Assigned Classes</span>

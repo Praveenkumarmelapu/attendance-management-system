@@ -145,7 +145,7 @@ const AttendanceReports = () => {
           {successMsg && <div className="alert alert-success">{successMsg}</div>}
 
           {/* Metric Overview Strip */}
-          <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '20px' }}>
+          <div className="stats-grid" style={{ marginBottom: '20px' }}>
             <div className="stat-card">
               <div className="stat-card-header">
                 <span className="stat-label">Total Logged</span>

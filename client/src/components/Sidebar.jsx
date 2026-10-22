@@ -3,9 +3,10 @@
  * Clean, structured navigation with role-based routing and Lucide icons
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useNav } from '../context/NavContext';
 import {
   LayoutDashboard,
   Users,
@@ -17,6 +18,7 @@ import {
   User,
   ShieldCheck,
   BookOpen,
+  X,
 } from 'lucide-react';
 
 const navConfig = {
@@ -41,6 +43,17 @@ const navConfig = {
 
 const Sidebar = () => {
   const { user } = useAuth();
+  const { mobileNavOpen, closeMobileNav } = useNav();
+
+  // Lock body scroll while the mobile drawer is open
+  useEffect(() => {
+    if (mobileNavOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = '';
+      };
+    }
+  }, [mobileNavOpen]);
   const links = navConfig[user?.role] || [];
 
   const roleLabel = {
@@ -50,7 +63,15 @@ const Sidebar = () => {
   }[user?.role] || 'User';
 
   return (
-    <aside className="app-sidebar">
+    <>
+      {/* Mobile backdrop overlay */}
+      <div
+        className={`sidebar-overlay ${mobileNavOpen ? 'mobile-open' : ''}`}
+        onClick={closeMobileNav}
+        aria-hidden="true"
+      />
+
+      <aside className={`app-sidebar ${mobileNavOpen ? 'mobile-open' : ''}`}>
       {/* Brand Header */}
       <div className="sidebar-brand">
         <div className="sidebar-brand-icon">
@@ -60,6 +81,15 @@ const Sidebar = () => {
           <div className="brand-title">EduAttend</div>
           <div className="brand-sub">Attendance System</div>
         </div>
+        <button
+          type="button"
+          className="sidebar-close-btn"
+          onClick={closeMobileNav}
+          aria-label="Close navigation menu"
+          id="mobile-menu-close"
+        >
+          <X size={18} />
+        </button>
       </div>
 
       {/* Role Pill */}
@@ -78,6 +108,7 @@ const Sidebar = () => {
               key={link.path}
               to={link.path}
               className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}
+              onClick={closeMobileNav}
             >
               <span className="sidebar-item-icon">
                 <IconComponent size={18} strokeWidth={2} />
@@ -120,6 +151,29 @@ const Sidebar = () => {
           gap: 12px;
           padding: 20px 20px 18px;
           border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-brand-text {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .sidebar-close-btn {
+          display: none;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          border-radius: var(--radius-md);
+          background-color: var(--bg-card);
+          border: 1px solid var(--border);
+          color: var(--text-secondary);
+          cursor: pointer;
+          flex-shrink: 0;
+        }
+
+        .sidebar-overlay {
+          display: none;
         }
 
         .sidebar-brand-icon {
@@ -262,11 +316,39 @@ const Sidebar = () => {
 
         @media (max-width: 900px) {
           .app-sidebar {
-            display: none;
+            transform: translateX(-105%);
+            transition: transform 0.25s ease;
+            width: 272px;
+            box-shadow: var(--shadow-lg);
+          }
+
+          .app-sidebar.mobile-open {
+            transform: translateX(0);
+          }
+
+          .sidebar-close-btn {
+            display: flex;
+          }
+
+          .sidebar-overlay {
+            display: block;
+            position: fixed;
+            inset: 0;
+            background-color: rgba(4, 8, 16, 0.62);
+            z-index: 190;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+          }
+
+          .sidebar-overlay.mobile-open {
+            opacity: 1;
+            pointer-events: auto;
           }
         }
       `}</style>
-    </aside>
+      </aside>
+    </>
   );
 };
 

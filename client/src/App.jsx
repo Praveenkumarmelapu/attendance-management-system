@@ -16,6 +16,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
+import { NavProvider } from './context/NavContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Public Pages
@@ -43,7 +44,8 @@ function App() {
   return (
     <AuthProvider>
       <ToastProvider>
-        <Router>
+        <NavProvider>
+          <Router>
           <Routes>
           {/* ─── Default redirect ─────────────────────────────────── */}
           <Route path="/" element={<Navigate to="/login" replace />} />
@@ -186,7 +188,8 @@ function App() {
             }
           />
         </Routes>
-      </Router>
+          </Router>
+        </NavProvider>
       </ToastProvider>
     </AuthProvider>
   );

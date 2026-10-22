@@ -95,7 +95,7 @@ const MyAttendance = () => {
           </div>
 
           {/* Stats Bar */}
-          <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(5, 1fr)', marginBottom: '20px' }}>
+          <div className="stats-grid" style={{ marginBottom: '20px' }}>
             <div className="stat-card">
               <div className="stat-card-header">
                 <span className="stat-label">Compliance Rate</span>

@@ -7,10 +7,12 @@ import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Calendar, UserCheck } from 'lucide-react';
+import { LogOut, Calendar, UserCheck, Menu } from 'lucide-react';
+import { useNav } from '../context/NavContext';
 
 const Navbar = ({ title }) => {
   const { user, logout } = useAuth();
+  const { toggleMobileNav } = useNav();
   const { confirm, toast } = useToast();
   const navigate = useNavigate();
 
@@ -48,6 +50,15 @@ const Navbar = ({ title }) => {
   return (
     <header className="app-navbar">
       <div className="navbar-left">
+        <button
+          type="button"
+          className="navbar-menu-btn"
+          onClick={toggleMobileNav}
+          aria-label="Open navigation menu"
+          id="mobile-menu-btn"
+        >
+          <Menu size={20} />
+        </button>
         <h2 className="navbar-title">{title || 'Dashboard'}</h2>
       </div>
 
@@ -95,6 +106,31 @@ const Navbar = ({ title }) => {
           justify-content: space-between;
           padding: 0 32px;
           z-index: 100;
+        }
+
+        .navbar-left {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          min-width: 0;
+        }
+
+        .navbar-menu-btn {
+          display: none;
+          align-items: center;
+          justify-content: center;
+          width: 34px;
+          height: 34px;
+          border-radius: var(--radius-md);
+          background-color: var(--bg-card);
+          border: 1px solid var(--border);
+          color: var(--text-primary);
+          cursor: pointer;
+          flex-shrink: 0;
+        }
+
+        .navbar-menu-btn:hover {
+          border-color: var(--border-focus);
         }
 
         .navbar-title {
@@ -185,11 +221,40 @@ const Navbar = ({ title }) => {
         @media (max-width: 900px) {
           .app-navbar {
             left: 0;
-            padding: 0 18px;
+            padding: 0 12px;
+          }
+
+          .navbar-menu-btn {
+            display: flex;
+          }
+
+          .navbar-title {
+            font-size: 1rem;
           }
 
           .navbar-date-chip {
             display: none;
+          }
+
+          .navbar-right {
+            gap: 8px;
+          }
+
+          .navbar-user-details {
+            display: none;
+          }
+
+          .navbar-user-chip {
+            padding: 4px;
+            border-radius: 50%;
+          }
+
+          .navbar-logout-btn span {
+            display: none;
+          }
+
+          .navbar-logout-btn {
+            padding: 6px 9px;
           }
         }
       `}</style>
