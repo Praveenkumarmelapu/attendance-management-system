@@ -1,0 +1,16 @@
+{
+  "name": "attendance-management-system",
+  "version": "1.0.0",
+  "description": "MERN Stack Attendance Management System",
+  "scripts": {
+    "dev": "npx -y concurrently -k -p \"[{name}]\" -n \"SERVER,CLIENT\" -c \"cyan,magenta\" \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "start": "npx -y concurrently -k -p \"[{name}]\" -n \"SERVER,CLIENT\" -c \"cyan,magenta\" \"npm start --prefix server\" \"npm run dev --prefix client\"",
+    "server": "npm run dev --prefix server",
+    "client": "npm run dev --prefix client",
+    "install:all": "npm install --prefix server && npm install --prefix client",
+    "build": "npm run build --prefix client"
+  },
+  "keywords": ["attendance", "mern"],
+  "author": "",
+  "license": "ISC"
+}
